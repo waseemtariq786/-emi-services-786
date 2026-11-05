@@ -1,0 +1,21 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "EMI Services 786",
+  "orientation": "any",
+  "scope": "/-emi-services-786/",
+  "short_name": "EMI 786",
+  "start_url": "/-emi-services-786/",
+  "theme_color": "#123d2c",
+  "description": "Electrical & Maintenance Inspection Services",
+  "id": "/-emi-services-786/",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
