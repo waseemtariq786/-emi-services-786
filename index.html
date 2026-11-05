@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#123d2c">
+<title>EMI Services 786 | Inspection System</title>
+<style>
+:root{--green:#155c3b;--green2:#21764e;--bg:#f3f6f4;--card:#fff;--ink:#17231c;--muted:#68756d;--line:#dce5df;--red:#b42318;--amber:#946200;--blue:#175cd3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Arial,system-ui,sans-serif}
+header{background:linear-gradient(120deg,#103b2a,#1b7048);color:white;padding:16px;position:sticky;top:0;z-index:5;box-shadow:0 2px 8px #0002}
+header h1{font-size:20px;margin:0}header p{font-size:12px;color:#d7ecdf;margin:3px 0 0}
+nav{display:flex;gap:6px;overflow-x:auto;padding:9px;background:white;border-bottom:1px solid var(--line);position:sticky;top:67px;z-index:4}
+nav button{white-space:nowrap;border:1px solid var(--line);border-radius:20px;padding:8px 12px;background:white;color:var(--ink);font-weight:bold}
+nav button.active{background:var(--green);color:white;border-color:var(--green)}
+main{max-width:950px;margin:auto;padding:12px}.page{display:none}.page.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px;margin-bottom:12px;box-shadow:0 2px 7px #122b1b08}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:0 0 9px}
+label{display:block;font-size:13px;font-weight:bold;margin:9px 0 4px}
+input,select,textarea{display:block;width:100%;padding:11px;border:1px solid #cbd8cf;border-radius:9px;background:white;color:var(--ink);font:inherit}
+textarea{min-height:66px;resize:vertical}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.btn{border:0;border-radius:9px;padding:10px 13px;background:var(--green);color:white;font-weight:bold;margin:5px 4px 2px 0}
+.btn.alt{background:#e8f1eb;color:#174b32;border:1px solid #c9ddcf}.btn.red{background:#fff0ef;color:var(--red);border:1px solid #f1c7c3}.btn.sm{font-size:12px;padding:6px 9px}
+.muted{font-size:12px;color:var(--muted)}.notice{padding:10px;background:#fff8e6;color:#755000;border-radius:9px;font-size:13px;margin-bottom:10px}
+.tilegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.tile{background:#edf5ef;border-radius:10px;padding:10px;text-align:center}.tile b{font-size:22px;display:block}
+.room,.item,.report{border:1px solid var(--line);border-radius:10px;padding:11px;margin:9px 0;background:white}
+.flex{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.pill{font-size:11px;background:#edf4ef;padding:3px 8px;border-radius:20px;font-weight:bold}
+.item-detail{border-top:1px solid var(--line);margin-top:9px;padding-top:7px}.hidden{display:none!important}
+.result-pass{color:#168044;font-weight:bold}.result-fail{color:var(--red);font-weight:bold}.result-na{color:var(--muted);font-weight:bold}
+.photo-preview{max-width:180px;max-height:150px;display:block;margin-top:8px;border-radius:8px}
+hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+footer{text-align:center;padding:18px;color:var(--muted);font-size:11px}
+#printArea{display:none}
+@media(max-width:520px){main{padding:9px}.grid{grid-template-columns:1fr}.tilegrid{grid-template-columns:repeat(3,1fr)}}
+@media print{
+body{background:white}header,nav,main,footer{display:none!important}#printArea{display:block!important;padding:12px;color:#111;font:12px Arial}
+#printArea h1{font-size:20px}#printArea h2{font-size:16px;margin-top:18px}#printArea table{width:100%;border-collapse:collapse;margin:8px 0}
+#printArea th,#printArea td{border:1px solid #888;padding:6px;text-align:left;vertical-align:top}
+#printArea img{max-width:120px;max-height:100px}.printbreak{break-before:page}
+}
+</style>
+</head>
+<body>
+<header><h1>EMI Services 786</h1><p>Electrical • Building • Machinery • Maintenance Inspection</p></header>
+<nav id="navigation">
+<button class="active" data-page="dashboard">Dashboard</button>
+<button data-page="factories">Factories</button>
+<button data-page="rooms">Rooms & Items</button>
+<button data-page="inspection">Inspection</button>
+<button data-page="reports">Reports</button>
+<button data-page="backup">Backup</button>
+</nav>
+<main>
+<section id="dashboard" class="page active">
+<div class="card"><h2>Inspection Dashboard</h2><div class="tilegrid">
+<div class="tile"><b id="statFactories">0</b><span class="muted">Factories</span></div>
+<div class="tile"><b id="statRooms">0</b><span class="muted">Rooms</span></div>
+<div class="tile"><b id="statReports">0</b><span class="muted">Reports</span></div>
+</div><p id="currentFactoryText" class="muted">No factory selected.</p></div>
+<div class="card"><h3>Start inspection</h3><p>1. Factory add karein. 2. Factory select karein. 3. Rooms aur inventory items add karein. 4. Inspection complete karke report save karein.</p>
+<button class="btn" data-go="factories">Add / Select Factory</button><button class="btn alt" data-go="rooms">Manage Rooms</button></div>
+<div class="notice">Safety note: App inspection record banati hai. Electrical testing aur repair sirf competent/authorized person kare. App kisi live electrical system ko test nahi karti.</div>
+</section>
+
+<section id="factories" class="page">
+<div class="card"><h2>Factory Details</h2>
+<label>Select current factory</label><select id="factorySelect"><option value="">-- Select Factory --</option></select>
+<div class="grid"><div><label>Factory Name *</label><input id="factoryName" placeholder="ABC Gloves Factory"></div><div><label>Contact Number</label><input id="factoryPhone" placeholder="03xxxxxxxxx"></div></div>
+<label>Factory Address</label><textarea id="factoryAddress" placeholder="Complete address"></textarea>
+<div class="grid"><div><label>Inspector Name</label><input id="factoryInspector" placeholder="Inspector name"></div><div><label>Inspection Type</label><select id="factoryType"><option>Electrical</option><option>Building</option><option>Machinery</option><option>Maintenance</option><option>Fire Safety</option><option>Complete Inspection</option></select></div></div>
+<label>General Notes</label><textarea id="factoryNotes" placeholder="Any additional information"></textarea>
+<button class="btn" id="saveFactory">Save Factory</button><button class="btn alt" id="newFactory">New Factory</button><button class="btn red" id="deleteFactory">Delete Selected Factory</button>
+<p class="muted" id="factoryMessage">Save factory details before adding rooms.</p>
+</div></section>
+
+<section id="rooms" class="page">
+<div class="card"><h2>Rooms & Inventory</h2><p class="muted" id="roomFactoryLabel">Select a factory first.</p>
+<div class="grid"><div><label>Room name</label><input id="newRoomName" placeholder="e.g. Stitching Hall"></div><div style="align-self:end"><button class="btn" id="addRoom">+ Add Room</button></div></div>
+<div id="roomsList"></div>
+</div></section>
+
+<section id="inspection" class="page">
+<div class="card"><h2>Room Inspection</h2><p class="muted" id="inspectionFactoryLabel"></p>
+<label>Select room</label><select id="inspectionRoom"></select>
+<div class="grid"><div><label>Inspection date</label><input id="inspectionDate" type="date"></div><div><label>Inspector</label><input id="inspectionInspector" placeholder="Inspector name"></div></div>
+<label>Inspection notes</label><textarea id="inspectionNotes" placeholder="General notes for this room inspection"></textarea>
+<div id="inspectionItems"></div>
+<button class="btn" id="saveInspection">Save Inspection Report</button>
+</div></section>
+
+<section id="reports" class="page">
+<div class="card"><h2>Saved Reports</h2><p class="muted">Report ko open karke Print / Save as PDF karein.</p><div id="reportsList"></div></div>
+</section>
+
+<section id="backup" class="page">
+<div class="card"><h2>Backup & Restore</h2><p>Apne factories, rooms, items aur reports ka backup phone mein download karein.</p>
+<button class="btn" id="downloadBackup">Download Backup JSON</button>
+<label>Restore backup file</label><input id="restoreFile" type="file" accept=".json,application/json">
+<button class="btn alt" id="restoreBackup">Restore Backup</button>
+<hr><button class="btn red" id="wipeData">Delete All App Data</button>
+<p class="muted" id="backupMessage">Regular backup zaroor banayein.</p></div>
+</section>
+</main>
+<div id="printArea"></div>
+<footer>EMI Services 786 • Offline inspection record system</footer>
+
+<script>
+(function(){
+"use strict";
+const STORAGE_KEY="emi786_complete_v3";
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const fresh=()=>({factories:[],currentFactoryId:"",reports:[]});
+let state=load();
+let pendingRestore=null;
+function load(){
+ try{
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(!raw)return fresh();
+  const obj=JSON.parse(raw);
+  if(!obj||!Array.isArray(obj.factories)||!Array.isArray(obj.reports))return fresh();
+  return obj;
+ }catch(e){return fresh();}
+}
+function save(){
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));renderDashboard();return true;}
+ catch(e){alert("Phone storage full ho sakti hai. Photo ka size kam karein ya backup bana kar purana data remove karein.");return false;}
+}
+function esc(value){
+ return String(value==null?"":value).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function currentFactory(){return state.factories.find(f=>f.id===state.currentFactoryId)||null;}
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));
+ document.querySelectorAll("#navigation button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+ if(id==="factories")renderFactories();
+ if(id==="rooms")renderRooms();
+ if(id==="inspection")prepareInspection();
+ if(id==="reports")renderReports();
+ if(id==="dashboard")renderDashboard();
+ window.scrollTo(0,0);
+}
+$("navigation").addEventListener("click",e=>{
+ const b=e.target.closest("button[data-page]");if(b)showPage(b.dataset.page);
+});
+document.addEventListener("click",e=>{
+ const go=e.target.closest("[data-go]");if(go)showPage(go.dataset.go);
+});
+function renderDashboard(){
+ $("statFactories").textContent=state.factories.length;
+ const f=currentFactory();
+ $("statRooms").textContent=f?f.rooms.length:0;
+ $("statReports").textContent=state.reports.length;
+ $("currentFactoryText").textContent=f?"Current factory: "+f.name:"No factory selected.";
+}
+function clearFactoryForm(){
+ ["factoryName","factoryPhone","factoryAddress","factoryInspector","factoryNotes"].forEach(id=>$(id).value="");
+ $("factoryType").value="Electrical";
+}
+function renderFactories(){
+ const sel=$("factorySelect"),old=state.currentFactoryId;
+ sel.innerHTML='<option value="">-- Select Factory --</option>'+state.factories.map(f=>`<option value="${esc(f.id)}">${esc(f.name)}</option>`).join("");
+ sel.value=old;
+ const f=currentFactory();
+ if(f){
+  $("factoryName").value=f.name||"";$("factoryPhone").value=f.phone||"";
+  $("factoryAddress").value=f.address||"";$("factoryInspector").value=f.inspector||"";
+  $("factoryType").value=f.type||"Electrical";$("factoryNotes").value=f.notes||"";
+ }else clearFactoryForm();
+}
+$("factorySelect").addEventListener("change",()=>{
+ state.currentFactoryId=$("factorySelect").value;save();renderFactories();
+});
+$("newFactory").addEventListener("click",()=>{
+ state.currentFactoryId="";save();renderFactories();$("factoryName").focus();
+});
+$("saveFactory").addEventListener("click",()=>{
+ const name=$("factoryName").value.trim();
+ if(!name){alert("Factory name zaroor likhein.");return;}
+ const details={name,phone:$("factoryPhone").value.trim(),address:$("factoryAddress").value.trim(),inspector:$("factoryInspector").value.trim(),type:$("factoryType").value,notes:$("factoryNotes").value.trim()};
+ let f=currentFactory();
+ if(f)Object.assign(f,details);
+ else{f={id:uid(),...details,rooms:[]};state.factories.push(f);state.currentFactoryId=f.id;}
+ if(save()){renderFactories();$("factoryMessage").textContent="Factory saved successfully.";}
+});
+$("deleteFactory").addEventListener("click",()=>{
+ const f=currentFactory();if(!f){alert("Pehle factory select karein.");return;}
+ if(!confirm(f.name+" aur is ke rooms delete kar dein? Purani reports rehengi."))return;
+ state.factories=state.factories.filter(x=>x.id!==f.id);state.currentFactoryId=state.factories[0]?.id||"";save();renderFactories();renderRooms();
+});
+$("addRoom").addEventListener("click",()=>{
+ const f=currentFactory();if(!f){alert("Pehle factory save aur select karein.");showPage("factories");return;}
+ const name=$("newRoomName").value.trim();if(!name){alert("Room ka naam likhein.");return;}
+ f.rooms.push({id:uid(),name,items:[]});$("newRoomName").value="";save();renderRooms();
+});
+function renderRooms(){
+ const f=currentFactory();$("roomFactoryLabel").textContent=f?"Factory: "+f.name:"Select a factory first.";
+ const host=$("roomsList");
+ if(!f){host.innerHTML='<p class="muted">Factory select ya create karein.</p>';return;}
+ if(!f.rooms.length){host.innerHTML='<p class="muted">Abhi room nahi. Upar room name likh kar Add Room dabayein.</p>';return;}
+ host.innerHTML=f.rooms.map(r=>`
+ <div class="room">
+  <div class="flex"><strong>${esc(r.name)}</strong><span class="pill">${r.items.length} items</span></div>
+  <button class="btn sm alt" data-action="rename-room" data-id="${r.id}">Rename</button>
+  <button class="btn sm red" data-action="delete-room" data-id="${r.id}">Delete Room</button>
+  <div class="item-detail">${r.items.length?r.items.map(i=>`
+   <div class="item"><div class="flex"><strong>${esc(i.name)}</strong><span class="muted">${esc(i.quantity)} ${esc(i.unit)}</span></div>
+   <button class="btn sm alt" data-action="edit-item" data-room="${r.id}" data-id="${i.id}">Edit</button>
+   <button class="btn sm red" data-action="delete-item" data-room="${r.id}" data-id="${i.id}">Delete</button></div>`).join(""):'<p class="muted">No inventory items in this room.</p>'}
+  </div><button class="btn sm" data-action="add-item" data-id="${r.id}">+ Add inventory item</button>
+ </div>`).join("");
+}
+$("roomsList").addEventListener("click",e=>{
+ const b=e.target.closest("button[data-action]");if(!b)return;
+ const f=currentFactory();if(!f)return;
+ const r=f.rooms.find(x=>x.id===(b.dataset.room||b.dataset.id));
+ switch(b.dataset.action){
+ case "rename-room":{const room=f.rooms.find(x=>x.id===b.dataset.id);const n=prompt("Room ka naya naam:",room?.name||"");if(n&&n.trim()){room.name=n.trim();save();renderRooms();}break;}
+ case "delete-room":{const room=f.rooms.find(x=>x.id===b.dataset.id);if(room&&confirm("Room aur is ke inventory items delete?")){f.rooms=f.rooms.filter(x=>x.id!==room.id);save();renderRooms();}break;}
+ case "add-item":addInventoryItem(f,b.dataset.id);break;
+ case "edit-item":editInventoryItem(f,b.dataset.room,b.dataset.id);break;
+ case "delete-item":{const room=f.rooms.find(x=>x.id===b.dataset.room);if(room&&confirm("Inventory item delete?")){room.items=room.items.filter(x=>x.id!==b.dataset.id);save();renderRooms();}break;}
+ }
+});
+function addInventoryItem(f,roomId){
+ const name=prompt("Item name (Bulb, Fan, Socket, DB, MCB, Cable etc.):");if(!name||!name.trim())return;
+ const qtyText=prompt("Quantity / number:","1");if(qtyText===null)return;
+ const quantity=Math.max(0,Number(qtyText)||0);
+ const unit=prompt("Unit (Nos, meter, set, point):","Nos");if(unit===null)return;
+ const category=prompt("Category (Electrical, Building, Machinery, Other):","Electrical");if(category===null)return;
+ const room=f.rooms.find(x=>x.id===roomId);if(!room)return;
+ room.items.push({id:uid(),name:name.trim(),quantity,unit:unit.trim()||"Nos",category:category.trim()||"Other",description:""});
+ save();renderRooms();
+}
+function editInventoryItem(f,roomId,itemId){
+ const room=f.rooms.find(x=>x.id===roomId),it=room?.items.find(x=>x.id===itemId);if(!it)return;
+ const name=prompt("Item name:",it.name);if(name===null)return;
+ const qty=prompt("Quantity:",String(it.quantity));if(qty===null)return;
+ const unit=prompt("Unit:",it.unit);if(unit===null)return;
+ const cat=prompt("Category:",it.category);if(cat===null)return;
+ if(!name.trim()){alert("Item name empty nahi ho sakta.");return;}
+ Object.assign(it,{name:name.trim(),quantity:Math.max(0,Number(qty)||0),unit:unit.trim()||"Nos",category:cat.trim()||"Other"});
+ save();renderRooms();
+}
+function prepareInspection(){
+ const f=currentFactory();$("inspectionFactoryLabel").textContent=f?"Factory: "+f.name:"No factory selected.";
+ const sel=$("inspectionRoom");const old=sel.value;
+ sel.innerHTML=f?f.rooms.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join(""):"";
+ if(f&&f.rooms.some(r=>r.id===old))sel.value=old;
+ $("inspectionDate").value=today();$("inspectionInspector").value=f?.inspector||"";
+ renderInspectionItems();
+}
+$("inspectionRoom").addEventListener("change",renderInspectionItems);
+function renderInspectionItems(){
+ const f=currentFactory(),room=f?.rooms.find(r=>r.id===$("inspectionRoom").value),host=$("inspectionItems");
+ if(!f){host.innerHTML='<p class="muted">Factory select karein.</p>';return;}
+ if(!room){host.innerHTML='<p class="muted">Pehle Rooms & Items mein room aur inventory items add karein.</p>';return;}
+ if(!room.items.length){host.innerHTML='<p class="muted">Is room mein items nahi. Rooms & Items tab se add karein.</p>';return;}
+ host.innerHTML="<h3>Inventory inspection</h3>"+room.items.map(i=>`
+ <div class="item inspect-item" data-item-id="${i.id}">
+  <div class="flex"><strong>${esc(i.name)}</strong><span class="pill">${esc(i.quantity)} ${esc(i.unit)}</span></div>
+  <span class="muted">${esc(i.category)}</span>
+  <label>Result</label><select data-field="result"><option>Not Checked</option><option>Pass</option><option>Fail</option><option>N/A</option></select>
+  <div class="fail-box hidden">
+   <label>Problem observed</label><textarea data-field="problem" placeholder="Masla kya hai?"></textarea>
+   <label>Risk / possible danger</label><textarea data-field="risk" placeholder="Electric shock, fire, injury etc."></textarea>
+   <label>Recommended solution</label><textarea data-field="solution" placeholder="Masla theek karne ka recommended action"></textarea>
+   <label>Repair status</label><select data-field="repair"><option>Pending</option><option>In Progress</option><option>Resolved</option></select>
+  </div>
+  <label>Remarks</label><textarea data-field="remarks" placeholder="Additional observation"></textarea>
+  <label>Photo (optional, max 2 MB)</label><input type="file" accept="image/*" data-field="photo">
+  <img class="photo-preview hidden" alt="Selected inspection photo">
+ </div>`).join("");
+ host.querySelectorAll('[data-field="result"]').forEach(s=>s.addEventListener("change",()=>{
+  s.closest(".inspect-item").querySelector(".fail-box").classList.toggle("hidden",s.value!=="Fail");
+ }));
+ host.querySelectorAll('[data-field="photo"]').forEach(input=>input.addEventListener("change",async()=>{
+  const file=input.files&&input.files[0],img=input.closest(".inspect-item").querySelector("img");
+  if(!file){img.classList.add("hidden");return;}
+  if(!file.type.startsWith("image/")){alert("Image file select karein.");input.value="";return;}
+  if(file.size>2*1024*1024){alert("Photo 2 MB se chhoti rakhein.");input.value="";return;}
+  try{img.src=await compressImage(file);img.classList.remove("hidden");}
+  catch(err){alert("Photo load nahi ho saki.");}
+ }));
+}
+function compressImage(file){
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();reader.onerror=reject;
+  reader.onload=()=>{
+   const img=new Image();img.onerror=reject;
+   img.onload=()=>{
+    const max=1100,scale=Math.min(1,max/Math.max(img.width,img.height));
+    const canvas=document.createElement("canvas");canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+    const ctx=canvas.getContext("2d");ctx.drawImage(img,0,0,canvas.width,canvas.height);
+    resolve(canvas.toDataURL("image/jpeg",0.72));
+   };img.src=reader.result;
+  };reader.readAsDataURL(file);
+ });
+}
+$("saveInspection").addEventListener("click",async()=>{
+ const f=currentFactory(),room=f?.rooms.find(r=>r.id===$("inspectionRoom").value);
+ if(!f||!room){alert("Factory aur room select karein.");return;}
+ const nodes=[...document.querySelectorAll(".inspect-item")];if(!nodes.length){alert("Is room mein inventory items add karein.");return;}
+ const items=[];
+ for(const node of nodes){
+  const get=field=>node.querySelector(`[data-field="${field}"]`);
+  const result=get("result").value;
+  let photo="";
+  const img=node.querySelector(".photo-preview");if(!img.classList.contains("hidden"))photo=img.src;
+  const original=room.items.find(x=>x.id===node.dataset.itemId);
+  items.push({itemId:original.id,name:original.name,quantity:original.quantity,unit:original.unit,category:original.category,result,
+   problem:get("problem")?.value||"",risk:get("risk")?.value||"",solution:get("solution")?.value||"",
+   repair:get("repair")?.value||"Not Applicable",remarks:get("remarks").value,photo});
+ }
+ const report={id:uid(),factoryId:f.id,factoryName:f.name,factoryAddress:f.address,factoryPhone:f.phone,type:f.type,
+  roomId:room.id,roomName:room.name,date:$("inspectionDate").value||today(),inspector:$("inspectionInspector").value.trim(),
+  notes:$("inspectionNotes").value.trim(),items,created:new Date().toISOString()};
+ state.reports.unshift(report);
+ if(save()){alert("Inspection report saved successfully.");showPage("reports");}
+});
+function renderReports(){
+ const host=$("reportsList");
+ if(!state.reports.length){host.innerHTML='<p class="muted">No reports saved yet.</p>';return;}
+ host.innerHTML=state.reports.map(r=>{
+  const pass=r.items.filter(i=>i.result==="Pass").length,fail=r.items.filter(i=>i.result==="Fail").length,unchecked=r.items.filter(i=>i.result==="Not Checked").length;
+  return `<div class="report"><div class="flex"><strong>${esc(r.factoryName)} — ${esc(r.roomName)}</strong><span class="pill">${esc(r.date)}</span></div>
+  <p class="muted">${esc(r.type)} • Inspector: ${esc(r.inspector||"Not specified")}</p>
+  <p><b>Pass:</b> ${pass} &nbsp; <b>Fail:</b> ${fail} &nbsp; <b>Not checked:</b> ${unchecked}</p>
+  <button class="btn sm" data-action="print-report" data-id="${r.id}">Open / Print PDF</button>
+  <button class="btn sm red" data-action="delete-report" data-id="${r.id}">Delete</button></div>`;
+ }).join("");
+}
+$("reportsList").addEventListener("click",e=>{
+ const b=e.target.closest("button[data-action]");if(!b)return;
+ const r=state.reports.find(x=>x.id===b.dataset.id);if(!r)return;
+ if(b.dataset.action==="print-report")printReport(r);
+ if(b.dataset.action==="delete-report"&&confirm("Ye report delete karni hai?")){state.reports=state.reports.filter(x=>x.id!==r.id);save();renderReports();}
+});
+function printReport(r){
+ const rows=r.items.map(i=>`<tr><td>${esc(i.name)}<br><small>${esc(i.quantity)} ${esc(i.unit)}</small></td><td>${esc(i.result)}</td><td>${esc(i.problem)}</td><td>${esc(i.risk)}</td><td>${esc(i.solution)}</td><td>${esc(i.repair)}</td><td>${esc(i.remarks)}${i.photo?`<br><img src="${i.photo}">`:""}</td></tr>`).join("");
+ $("printArea").innerHTML=`<h1>EMI Services 786</h1><h2>Electrical & Maintenance Inspection Report</h2>
+ <p><b>Factory:</b> ${esc(r.factoryName)}<br><b>Address:</b> ${esc(r.factoryAddress)}<br><b>Contact:</b> ${esc(r.factoryPhone)}<br>
+ <b>Room / Area:</b> ${esc(r.roomName)}<br><b>Inspection Type:</b> ${esc(r.type)}<br><b>Date:</b> ${esc(r.date)}<br><b>Inspector:</b> ${esc(r.inspector)}</p>
+ <p><b>General Notes:</b> ${esc(r.notes)}</p><table><thead><tr><th>Item / Quantity</th><th>Result</th><th>Problem</th><th>Risk</th><th>Recommended Solution</th><th>Repair Status</th><th>Remarks / Photo</th></tr></thead><tbody>${rows}</tbody></table>
+ <p><b>Summary:</b> ${r.items.filter(i=>i.result==="Pass").length} Pass • ${r.items.filter(i=>i.result==="Fail").length} Fail • ${r.items.filter(i=>i.result==="Not Checked").length} Not Checked • ${r.items.filter(i=>i.result==="N/A").length} N/A</p>
+ <p><b>Inspector Signature:</b> ____________________ &nbsp;&nbsp; <b>Factory Representative:</b> ____________________</p>`;
+ window.print();
+}
+$("downloadBackup").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="EMI-Services-786-Backup.json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ $("backupMessage").textContent="Backup download started.";
+});
+$("restoreBackup").addEventListener("click",()=>{
+ const file=$("restoreFile").files[0];if(!file){alert("Pehle backup JSON file select karein.");return;}
+ const reader=new FileReader();reader.onerror=()=>alert("File read nahi ho saki.");
+ reader.onload=()=>{
+  try{const obj=JSON.parse(reader.result);if(!obj||!Array.isArray(obj.factories)||!Array.isArray(obj.reports))throw new Error("Invalid");
+   if(!confirm("Current app data replace karke backup restore karna hai?"))return;
+   state=obj;if(save()){renderFactories();renderRooms();renderReports();$("backupMessage").textContent="Backup restored.";}
+  }catch(e){alert("Ye valid EMI backup JSON file nahi hai.");}
+ };reader.readAsText(file);
+});
+$("wipeData").addEventListener("click",()=>{
+ if(!confirm("Tamam factories, rooms aur reports delete karni hain?"))return;
+ if(!confirm("Final confirmation: pehle backup banaya hai?"))return;
+ state=fresh();save();renderFactories();renderRooms();renderReports();$("backupMessage").textContent="All app data deleted.";
+});
+renderDashboard();renderFactories();
+})();
+</script>
+</body>
+</html>
